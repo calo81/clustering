@@ -32,7 +32,6 @@ public class AllTranslationReducer extends Reducer<Text, Text, Writable, Text> {
     ) throws IOException, InterruptedException {
         Map<String, String> translations = new HashMap<String, String>();
         for (Text val : values) {
-            Logger.getAnonymousLogger().info(val.toString());
             String[] keyAndValue = val.toString().split(":");
             translations.put(keyAndValue[0], keyAndValue[1]);
 
@@ -42,7 +41,7 @@ public class AllTranslationReducer extends Reducer<Text, Text, Writable, Text> {
             finalElement.append(translations.get("first_name")).append(",");
             finalElement.append(translations.get("vertical"));
             result.set(finalElement.toString());
-            context.write(NullWritable.get(), result);
         }
+        context.write(NullWritable.get(), result);
     }
 }

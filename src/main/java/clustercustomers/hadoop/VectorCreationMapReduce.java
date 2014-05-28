@@ -29,7 +29,6 @@ public class VectorCreationMapReduce extends Configured implements Tool {
     public static class VectorizerMapper extends Mapper<LongWritable, Text, Text, VectorWritable> {
 
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            System.out.println("DHAJAGSJDHGAJSHGD"+value.toString());
             String[] values = value.toString().split(",");
 
             VectorWritable writer = new VectorWritable();

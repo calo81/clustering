@@ -14,8 +14,8 @@
     <file path="/CustomerMongoPersonalToSequenceFileProcessor.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401199476648" ignored="false" />
     <file path="/fragment.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401278999199" ignored="false" />
     <file path="/CustomerMongoWebRfqToSequenceFile.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401205332329" ignored="false" />
-    <file path="/CustomerMapReduce.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401208081253" ignored="false" />
-    <file path="/AllTranslationReducer.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401269224725" ignored="false" />
+    <file path="/CustomerMapReduce.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401285486295" ignored="false" />
+    <file path="/AllTranslationReducer.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401285092710" ignored="false" />
     <file path="/WordMapper.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401211362443" ignored="false" />
     <file path="/VectorCreationMapReduce.java" changelist="83559812-9003-4aeb-8ce2-ca850a83fc52" time="1401276486226" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -173,7 +173,7 @@
       <file leaf-file-name="App.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/App.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="71" column="54" selection-start="0" selection-end="4401" vertical-scroll-proportion="0.0">
+            <state line="67" column="44" selection-start="2398" selection-end="2398" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1118#1131#0" expanded="true" />
@@ -207,7 +207,7 @@
       <file leaf-file-name="Routes.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/camel/Routes.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="42" selection-start="339" selection-end="339" vertical-scroll-proportion="0.0">
+            <state line="19" column="21" selection-start="704" selection-end="745" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -215,10 +215,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CustomerMapReduce.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CustomerMapReduce.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/CustomerMapReduce.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="30" selection-start="397" selection-end="414" vertical-scroll-proportion="0.0">
+            <state line="26" column="63" selection-start="1118" selection-end="1118" vertical-scroll-proportion="0.5703125">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -226,37 +226,42 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Path.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/fs/Path.class">
+      <file leaf-file-name="FileOutputFormat.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/mapreduce/lib/output/FileOutputFormat.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="11" selection-start="533" selection-end="533" vertical-scroll-proportion="-4.6">
+            <state line="26" column="23" selection-start="1742" selection-end="1742" vertical-scroll-proportion="-15.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClusterClassificationDriver.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/mahout/mahout-core/0.9/mahout-core-0.9-sources.jar!/org/apache/mahout/clustering/classify/ClusterClassificationDriver.java">
+      <file leaf-file-name="WordMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/WordMapper.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="305" column="0" selection-start="13772" selection-end="13772" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="19" column="101" selection-start="536" selection-end="536" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PathFilters.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/mahout/mahout-core/0.9/mahout-core-0.9-sources.jar!/org/apache/mahout/common/iterator/sequencefile/PathFilters.java">
+      <file leaf-file-name="AllTranslationReducer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/AllTranslationReducer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="68" column="27" selection-start="2250" selection-end="2250" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="32" column="73" selection-start="943" selection-end="943" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#924#940#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VectorCreationMapReduce.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="VectorCreationMapReduce.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/VectorCreationMapReduce.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="36" selection-start="1071" selection-end="1094" vertical-scroll-proportion="0.7421875">
+            <state line="30" column="113" selection-start="1347" selection-end="1347" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -292,13 +297,13 @@
         <option value="$PROJECT_DIR$/src/main/java/cluster_customers/hadoop/CustomerMapReduce.java" />
         <option value="$PROJECT_DIR$/src/main/java/clustercustomers/camel/CustomerMongoWebRfqToSequenceFile.java" />
         <option value="$PROJECT_DIR$/src/main/java/clustercustomers/camel/CustomerMongoPersonalToSequenceFileProcessor.java" />
-        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/CustomerMapReduce.java" />
         <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/WordMapper.java" />
-        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/AllTranslationReducer.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/VectorCreationMapReduce.java" />
         <option value="$PROJECT_DIR$/src/main/java/clustercustomers/App.java" />
         <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/SequenceFileReader.java" />
+        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/VectorCreationMapReduce.java" />
+        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/AllTranslationReducer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/CustomerMapReduce.java" />
       </list>
     </option>
   </component>
@@ -971,20 +976,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="129" column="21" selection-start="4597" selection-end="4597" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/mahout/mahout-core/0.9/mahout-core-0.9-sources.jar!/org/apache/mahout/math/VectorWritable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="19" selection-start="1126" selection-end="1126" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/mapreduce/lib/input/TextInputFormat.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="13" selection-start="180" selection-end="180" vertical-scroll-proportion="-3.0">
@@ -1003,15 +994,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="21" column="11" selection-start="913" selection-end="913" vertical-scroll-proportion="-12.0">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/WordMapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="101" selection-start="536" selection-end="536" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1043,9 +1025,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/SequenceFileReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="41" selection-start="858" selection-end="858" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/VectorCreationMapReduce.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="113" selection-start="1347" selection-end="1347" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/App.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="54" selection-start="0" selection-end="4401" vertical-scroll-proportion="0.0">
+        <state line="67" column="44" selection-start="2398" selection-end="2398" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1118#1131#0" expanded="true" />
@@ -1053,9 +1053,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/SequenceFileReader.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/WordMapper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="41" selection-start="858" selection-end="858" vertical-scroll-proportion="0.0">
+        <state line="19" column="101" selection-start="536" selection-end="536" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/camel/Routes.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="21" selection-start="704" selection-end="745" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1071,27 +1080,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/camel/Routes.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/AllTranslationReducer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="42" selection-start="339" selection-end="339" vertical-scroll-proportion="0.0">
+        <state line="32" column="73" selection-start="943" selection-end="943" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#924#940#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/mapreduce/lib/output/FileOutputFormat.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="23" selection-start="1742" selection-end="1742" vertical-scroll-proportion="-15.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/CustomerMapReduce.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="30" selection-start="397" selection-end="414" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/clustercustomers/hadoop/VectorCreationMapReduce.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="36" selection-start="1071" selection-end="1094" vertical-scroll-proportion="0.7421875">
+        <state line="26" column="63" selection-start="1118" selection-end="1118" vertical-scroll-proportion="0.5703125">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
