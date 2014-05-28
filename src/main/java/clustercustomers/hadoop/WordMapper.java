@@ -18,8 +18,6 @@ public class WordMapper extends Mapper<Text, Text, Text, Text> {
     private Text word = new Text();
 
     public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-        System.out.println(key.toString());
-        System.out.println(value.toString());
         StringTokenizer itr = new StringTokenizer(value.toString(), ",");
         while (itr.hasMoreTokens()) {
             word.set(itr.nextToken());
