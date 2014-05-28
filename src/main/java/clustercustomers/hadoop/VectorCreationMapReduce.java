@@ -1,5 +1,6 @@
 package clustercustomers.hadoop;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -24,6 +25,13 @@ import org.apache.mahout.math.VectorWritable;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+/**
+ * Order in which the data arrives here:
+ *
+ * (customer_id,vertical,trade,income,insurer,email,firstname)
+ *
+ * Verticals. let's put three features
+ */
 public class VectorCreationMapReduce extends Configured implements Tool {
 
     public static class VectorizerMapper extends Mapper<LongWritable, Text, Text, VectorWritable> {
@@ -32,9 +40,23 @@ public class VectorCreationMapReduce extends Configured implements Tool {
             String[] values = value.toString().split(",");
 
             VectorWritable writer = new VectorWritable();
-            NamedVector vector = new NamedVector(new DenseVector(new double[]{0, 10, 4}), values[0]);
+            double[] verticals = vectorForVertical(values[1]);
+            double[] trade = vectorForTrade(values[2]);
+            NamedVector vector = new NamedVector(new DenseVector(ArrayUtils.addAll(verticals,trade)), values[0]);
             writer.set(vector);
             context.write(new Text(values[0]), writer);
+        }
+
+        private double[] vectorForTrade(String value) {
+            return new double[]{is(value, "Accountant"), is(value, "Plumber")};  //To change body of created methods use File | Settings | File Templates.
+        }
+
+        private double[] vectorForVertical(String value) {
+            return new double[]{is(value, "Business"), is(value, "Landlord"), is(value, "Shop")};  //To change body of created methods use File | Settings | File Templates.
+        }
+
+        private int is(String value, String expected) {
+            return (value != null && value.equals(expected)) ? 1 : 0;
         }
     }
 

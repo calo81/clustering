@@ -20,8 +20,8 @@ public class CustomerMapReduce
         conf.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", "|");
         Job job = new Job(conf, "customer_map_reduce");
         job.setJarByClass(VectorCreationMapReduce.class);
-        job.setMapperClass(WordMapper.class);
-        job.setReducerClass(AllTranslationReducer.class);
+        job.setMapperClass(CustomerAggregationMapper.class);
+        job.setReducerClass(CustomerAggegationReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         job.setInputFormatClass(KeyValueTextInputFormat.class);

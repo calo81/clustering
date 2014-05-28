@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
  * Time: 17:42
  * To change this template use File | Settings | File Templates.
  */
-public class WordMapper extends Mapper<Text, Text, Text, Text> {
+public class CustomerAggregationMapper extends Mapper<Text, Text, Text, Text> {
 
     private Text word = new Text();
 

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * {id,email,first_name,vertical}
  */
 
-public class AllTranslationReducer extends Reducer<Text, Text, Writable, Text> {
+public class CustomerAggegationReducer extends Reducer<Text, Text, Writable, Text> {
     private Text result = new Text();
 
     public void reduce(Text key, Iterable<Text> values,
@@ -37,9 +37,12 @@ public class AllTranslationReducer extends Reducer<Text, Text, Writable, Text> {
 
             StringBuilder finalElement = new StringBuilder();
             finalElement.append(key.toString().split(":")[1]).append(",");
+            finalElement.append(translations.get("vertical")).append(",");
+            finalElement.append(translations.get("primary_trade")).append(",");
+            finalElement.append(translations.get("annual_turnover")).append(",");
+            finalElement.append(translations.get("selected_insurer")).append(",");
             finalElement.append(translations.get("email_address")).append(",");
-            finalElement.append(translations.get("first_name")).append(",");
-            finalElement.append(translations.get("vertical"));
+            finalElement.append(translations.get("first_name"));
             result.set(finalElement.toString());
         }
         context.write(NullWritable.get(), result);
