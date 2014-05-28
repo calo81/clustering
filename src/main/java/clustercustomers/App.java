@@ -56,7 +56,11 @@ public class App {
                 "lopez:8634");
 
         customers.add(customer);
+        //Configuration conf = new Configuration();
         Configuration conf = new Configuration();
+        conf.set("fs.default.name", "hdfs://192.168.1.10:9000/");
+        conf.set("mapred.job.tracker", "192.168.1.10:9001");
+
         FileSystem fs = FileSystem.get(conf);
 
         Path path = new Path("customerdata/customers");
@@ -86,7 +90,7 @@ public class App {
         DistanceMeasure measure = new EuclideanDistanceMeasure();
 
 
-        RandomSeedGenerator.buildRandom(conf, path, clustersIn, 2, measure);
+        RandomSeedGenerator.buildRandom(conf, path, clustersIn, 1, measure);
         KMeansDriver.run(conf, path, clustersIn, output, 0.01, 10, true,
                 0.0, true);
 
