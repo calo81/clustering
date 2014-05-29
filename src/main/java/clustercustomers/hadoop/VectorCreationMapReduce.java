@@ -1,5 +1,6 @@
 package clustercustomers.hadoop;
 
+import clustercustomers.sqoop.QueryResult;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -12,6 +13,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
@@ -28,23 +30,22 @@ import java.util.StringTokenizer;
 /**
  * Order in which the data arrives here:
  *
- * (customer_id,vertical,trade,income,insurer,email,firstname)
+ * (customer_id,vertical,trade,annual_turnover, claim_count)
  *
  * Verticals. let's put three features
  */
 public class VectorCreationMapReduce extends Configured implements Tool {
 
-    public static class VectorizerMapper extends Mapper<LongWritable, Text, Text, VectorWritable> {
+    public static class VectorizerMapper extends Mapper<LongWritable, QueryResult, Text, VectorWritable> {
 
-        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            String[] values = value.toString().split(",");
+        public void map(LongWritable key, QueryResult value, Context context) throws IOException, InterruptedException {
 
             VectorWritable writer = new VectorWritable();
-            double[] verticals = vectorForVertical(values[1]);
-            double[] trade = vectorForTrade(values[2]);
-            NamedVector vector = new NamedVector(new DenseVector(ArrayUtils.addAll(verticals,trade)), values[0]);
+            double[] verticals = vectorForVertical(value.get_product());
+            double[] trade = vectorForTrade(value.get_primary_trade());
+            NamedVector vector = new NamedVector(new DenseVector(ArrayUtils.addAll(verticals,trade)), value.get___id());
             writer.set(vector);
-            context.write(new Text(values[0]), writer);
+            context.write(new Text(value.get___id()), writer);
         }
 
         private double[] vectorForTrade(String value) {
@@ -52,7 +53,7 @@ public class VectorCreationMapReduce extends Configured implements Tool {
         }
 
         private double[] vectorForVertical(String value) {
-            return new double[]{is(value, "Business"), is(value, "Landlord"), is(value, "Shop")};  //To change body of created methods use File | Settings | File Templates.
+            return new double[]{is(value, "business"), is(value, "landlord"), is(value, "shop")};  //To change body of created methods use File | Settings | File Templates.
         }
 
         private int is(String value, String expected) {
@@ -79,7 +80,7 @@ public class VectorCreationMapReduce extends Configured implements Tool {
         job.setMapOutputValueClass(VectorWritable.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(VectorWritable.class);
-        job.setInputFormatClass(TextInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
         job.setNumReduceTasks(0);
         FileInputFormat.addInputPaths(job, "aggregated_customers");

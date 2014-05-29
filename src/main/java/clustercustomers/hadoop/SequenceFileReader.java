@@ -1,14 +1,12 @@
 package clustercustomers.hadoop;
 
-
+import clustercustomers.sqoop.QueryResult;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-import org.apache.mahout.clustering.classify.WeightedPropertyVectorWritable;
-import org.apache.mahout.clustering.iterator.ClusterWritable;
 import org.apache.mahout.math.VectorWritable;
 
 
@@ -25,9 +23,10 @@ public class SequenceFileReader {
 
         SequenceFile.Reader reader = new SequenceFile.Reader(fs,
                 new Path("/user/cscarion/vector_seq_file/part-m-00000"), conf);
-
         Text key = new Text();
         VectorWritable value = new VectorWritable();
+
+
         while (reader.next(key, value)) {
             System.out.println(key.toString() + " " + value.toString());
         }

@@ -111,6 +111,13 @@
             <version>2.13.0</version>
 
         </dependency>
+        <dependency>
+            <groupId>org.apache.sqoop</groupId>
+            <artifactId>sqoop</artifactId>
+            <version>1.4.4</version>
+            <classifier>hadoop100</classifier>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

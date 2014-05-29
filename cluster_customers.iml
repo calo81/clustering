@@ -90,6 +90,7 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:2.11.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.camel:camel-hdfs:2.13.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.sqoop:sqoop:hadoop100:1.4.4" level="project" />
   </component>
 </module>
 
