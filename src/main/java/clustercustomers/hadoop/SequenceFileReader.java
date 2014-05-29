@@ -24,10 +24,10 @@ public class SequenceFileReader {
 
 
         SequenceFile.Reader reader = new SequenceFile.Reader(fs,
-                new Path("/user/cscarion/customer-kmeans/clusteredPoints/part-m-00000"), conf);
+                new Path("/user/cscarion/vector_seq_file/part-m-00000"), conf);
 
-        IntWritable key = new IntWritable();
-        WeightedPropertyVectorWritable value = new WeightedPropertyVectorWritable();
+        Text key = new Text();
+        VectorWritable value = new VectorWritable();
         while (reader.next(key, value)) {
             System.out.println(key.toString() + " " + value.toString());
         }

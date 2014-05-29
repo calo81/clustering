@@ -16,6 +16,6 @@ public class CustomWeightedEuclideanDistanceMeasure extends WeightedEuclideanDis
 
     public CustomWeightedEuclideanDistanceMeasure(){
         super();
-        setWeights(new DenseVector(new double[]{10.0, 1.0}));
+        setWeights(new DenseVector(new double[]{1.0, 1.0, 1.0, 1.0, 1.0}));
     }
 }
