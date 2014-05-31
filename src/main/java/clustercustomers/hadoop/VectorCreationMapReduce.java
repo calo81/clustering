@@ -29,9 +29,9 @@ import java.util.StringTokenizer;
 
 /**
  * Order in which the data arrives here:
- *
+ * <p/>
  * (customer_id,vertical,trade,annual_turnover, claim_count)
- *
+ * <p/>
  * Verticals. let's put three features
  */
 public class VectorCreationMapReduce extends Configured implements Tool {
@@ -43,9 +43,19 @@ public class VectorCreationMapReduce extends Configured implements Tool {
             VectorWritable writer = new VectorWritable();
             double[] verticals = vectorForVertical(value.get_product());
             double[] trade = vectorForTrade(value.get_primary_trade());
-            NamedVector vector = new NamedVector(new DenseVector(ArrayUtils.addAll(verticals,trade)), value.get___id());
+            double[] turnover = vectorForDouble(value.get_annual_turnover());
+            double[] claimCount = vectorForDouble(value.get_claim_count());
+            NamedVector vector = new NamedVector(new DenseVector(concatArrays(verticals, trade, turnover, claimCount)), value.get___id());
             writer.set(vector);
             context.write(new Text(value.get___id()), writer);
+        }
+
+        private double[] vectorForDouble(String valueString) {
+            double value = 0;
+            if (valueString != null) {
+                value = Double.parseDouble(valueString);
+            }
+            return new double[]{value};
         }
 
         private double[] vectorForTrade(String value) {
@@ -59,10 +69,17 @@ public class VectorCreationMapReduce extends Configured implements Tool {
         private int is(String value, String expected) {
             return (value != null && value.equals(expected)) ? 1 : 0;
         }
+
+        private double[] concatArrays(double[]... arrays) {
+            double[] aggregatedArrays = new double[]{};
+            for (double[] array : arrays) {
+                aggregatedArrays = ArrayUtils.addAll(aggregatedArrays, array);
+            }
+            return aggregatedArrays;
+        }
     }
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         int res = ToolRunner.run(conf, new VectorCreationMapReduce(), args);
         System.exit(res);
