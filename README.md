@@ -17,10 +17,10 @@ This is tested to run only in Mac OSX
 - Extract the data from the datasources
   - Use [Sqoop](http://sqoop.apache.org/) for extracting the data from your SQL database to HDFS. Make sure you download a **Sqoop** version compatible with the installed **Hadoop** version which is 1.2.1.
     - Copy the JDBC driver for your DB (in my case SQL Server) into the **lib** directory of the **sqoop** installation directory
-    - `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=xx" --query 'select top 10 * from xxx a where a.x is not null and $CONDITIONS' --split-by  a._id --as-sequencefile --fetch-size 20 --delete-target-dir --target-dir importedCustomers -package-name "clustercustomers.sqoop"`
+    - `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=xx" --query 'select top 10 * from xxx a where a.x is not null and $CONDITIONS' --split-by  a._id --as-sequencefile --fetch-size 20 --delete-target-dir --target-dir importedCustomers -package-name "clustercustomers.sqoop" --null-string '' --fields-terminated-by ','`
     - Then copy the generated `QueryResults.java` (in the folder **clustercustomers.sqoop**) file to the **clustering** project under the correct package. This is needed as the Sequence File generated uses this class for the serialization/deserialization. So when we run the next map reduce tasks this file needs to exist.
     - Also copy the generated sequence files to the remote **Hadoop** cluster if you generated it with **Hadoop** locally as myself: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedCustomers hdfs://192.168.1.10:9000/user/cscarion/aggregated_customers`
-    - You can also generate a non SequenceFile file like: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://bi02lon:1433;username=xxxx;password=xxxx;databaseName=IHubODS" --query 'xxxx where $CONDITIONS' --split-by  customer._id --fetch-size 20 --delete-target-dir --target-dir importedCustomersText --package-name "clustercustomers.sqoop" --null-string ''`. This one will be used for the aggregations at the end of the whole process, as it is easier to use from **Apache Pig**
+    - You can also generate a non SequenceFile file like: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://bi02lon:1433;username=xxxx;password=xxxx;databaseName=IHubODS" --query 'xxxx where $CONDITIONS' --split-by  customer._id --fetch-size 20 --delete-target-dir --target-dir importedCustomersText --package-name "clustercustomers.sqoop" --null-string '' --null-string '' --fields-terminated-by '|'`. This one will be used for the aggregations at the end of the whole process, as it is easier to use from **Apache Pig**
     -Then of course copy this file as well to **HDFS**: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedCustomersText hdfs://192.168.1.10:9000/user/cscarion/aggregated_customers_text`
     - For running both **sqoop** tasks, you must unset `HADOOP_CONF_DIR` as if not it will try to run the jobs in the Hadoop cluster and those virtual machines have no access to the Database. That is in my case.
     - HADOOP_CONF_DIR must also be unset for the running of the `hadoop fs -put` command.
@@ -33,16 +33,17 @@ This is tested to run only in Mac OSX
   - To execute this program you have to do: `~/Programs/hadoop-1.2.1/bin/hadoop jar target/cluster_customers-1.0-SNAPSHOT.jar clustercustomers.hadoop.CustomerMapReduce`
 - Convert the file to a **Vectorized** `SequenceFile` which is the format that **Mahout** understands.
   - Execute the program `clustercustomers.hadoop.VectorCreationMapReduce`
-  - To execute this program you have to configure the environment variable: `export HADOOP_CLASSPATH=$PWD/target/lib/mahout-core-0.9.jar`
+  - To execute this program you have to configure the environment variable: `export HADOOP_CLASSPATH=/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar:/Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar`
   - Then tu run the job against the cluster you do: `~/Programs/hadoop-1.2.1/bin/hadoop jar target/cluster_customers-1.0-SNAPSHOT.jar clustercustomers.hadoop.VectorCreationMapReduce -libjars $PWD/target/lib/mahout-math-0.9.jar,$PWD/target/lib/mahout-core-0.9.jar,$PWD/target/lib/commons-lang3-3.1.jar,$PWD/target/lib/sqoop-1.4.4-hadoop100.jar`
   - In both previous steps `$PWD` is the **clustering** project root path.
 - Cluster the data.
+  - Again you have to set all the environment variables including: `export HADOOP_CLASSPATH=/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar:/Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar`
   - To cluster the customer data in the **Hadoop** cluster you run: `~/Programs/hadoop-1.2.1/bin/hadoop jar /Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar org.apache.mahout.clustering.kmeans.KMeansDriver -libjars /Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar,/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar -i /user/cscarion/vector_seq_file/part-m-00000 -c customer-clusters -o customer-kmeans -dm clustercustomers.mahout.CustomWeightedEuclideanDistanceMeasure -x 10 -k 3 -ow --clustering`
   - The previous command is run from the **Mahout** directory: `~/Programs/mahout-distribution-0.9`
   - You can also run a double step clustering. This is better as the centroids are not default ones. To do this you first run the **Canopy** clustering like:
     - `/Users/cscarion/Programs/hadoop-1.2.1/bin/hadoop jar /Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar org.apache.mahout.clustering.canopy.CanopyDriver -libjars /Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar,/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar -i /user/cscarion/vector_seq_file/part-m-00000 -o customer-centroids -dm clustercustomers.mahout.CustomWeightedEuclideanDistanceMeasure -t1 0.70 -t2 0.59`
   - Then you run the **kmeans** using those centroids:
-    - `~/Programs/hadoop-1.2.1/bin/hadoop jar /Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar org.apache.mahout.clustering.kmeans.KMeansDriver -libjars /Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar,/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar -i /user/cscarion/vector_seq_file/part-m-00000 -c customer-centroids/clusters-0 -o customer-kmeans -dm clustercustomers.mahout.CustomWeightedEuclideanDistanceMeasure -x 10 -ow --clustering`
+    - `~/Programs/hadoop-1.2.1/bin/hadoop jar /Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar org.apache.mahout.clustering.kmeans.KMeansDriver -libjars /Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar,/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar -i /user/cscarion/vector_seq_file/part-m-00000 -c customer-centroids/clusters-0-final -o customer-kmeans -dm clustercustomers.mahout.CustomWeightedEuclideanDistanceMeasure -x 10 -ow --clustering`
 - Check the created clusters visually
   - Run the command `bin/mahout clusterdump -o ~/graph.graphml  --input /user/cscarion/customer-kmeans/clusters-1-final --pointsDir /user/cscarion/customer-kmeans/clusteredPoints -of GRAPH_ML`
   - The previous command will generate a graph file that can be opened in a tool like **Graphviz**.
@@ -60,11 +61,37 @@ Generate individual Centroid files and one file with all Cluster centroids:
   - Firts I'll show an example of running some **Pig** interactively with the **Grunt** shell:
     - Run the file `$PIG_HOME/bin/pig`
     - The next steps are run on the `grunt>` prompt.
-    - Now load the aggregated customer data: `customers = LOAD '/user/cscarion/aggregated_customers_text' using PigStorage(',') AS(id, vertical, trade, turnover, claims);`
+    - Now load the aggregated customer data: `customers = LOAD '/user/cscarion/aggregated_customers_text' using PigStorage('|') AS(id, vertical, trade, turnover, claims,rfq_id);`
     - Next load the clustered data: `cluster = LOAD '/user/cscarion/individual-clusters/part-r-00000' AS(clusterId, customerId);`
     - Next do a grouping of the two by the customer id: `groupCluster = COGROUP customers BY id, cluster BY customerId INNER;`
-    - Check the average of the claims count: `claimAverage = FOREACH groupCluster GENERATE cluster.clusterId, AVG(customers.claims);`
-    - See the results: `DUMP claimAverage;`
+    - Flatten the values into maneagble structure: `flattened = FOREACH groupCluster GENERATE FLATTEN(cluster), FLATTEN(customers);`
+    - Get only the required fields for the calculation. This example shows using claims: `neededForAggrregate = FOREACH flattened GENERATE cluster::clusterId, cluster::customerId, customers::claims;`
+    - Group by cluster id: `grouped = GROUP neededForAggrregate BY cluster::clusterId`
+    - Get the claims: `claims = FOREACH grouped GENERATE group, AVG(neededForAggrregate.customers::claims);`
+    - See the results: `DUMP claims;`
+    - Now for the seeing the Premium average is similar. But this time we have to export the `quote` table information from `IHub` to `HDFS` as well. then combine it. Like this:
+      - Run the corresponding `Sqoop` Something like the following but with the actual data: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=IHubODS" --query 'SELECT rfq, premium FROM quotes where $CONDITIONS and premium is not null' --split-by  rfq --fetch-size 20 --delete-target-dir --target-dir importedQuotes --package-name "clustercustomers.sqoop.quotes" --null-string '' --fields-terminated-by '|'`  
+      - Copy the files generated to the remote HDFS: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedQuotes hdfs://192.168.1.10:9000/user/cscarion/imported_quotes`
+      - Then some more **Pig**
+      
+```
+premiums = LOAD '/user/cscarion/imported_quotes' USING PigStorage('|') AS(rfq_id, premium);
+cluster = LOAD '/user/cscarion/individual-clusters/part-r-00000' AS(clusterId, customerId);
+customers = LOAD '/user/cscarion/aggregated_customers_text' using PigStorage('|') AS(id, vertical, trade, turnover, claims,rfq_id);
+
+withPremiums = JOIN premiums BY rfq_id, customers BY rfq_id;
+
+store withPremiums into 'withPremiums' using PigStorage('|');
+
+groupCluster2 = JOIN withPremiums BY customers::id, cluster BY customerId;
+
+grouped2 = GROUP groupCluster2 BY cluster::clusterId;
+
+premiumsAverage = FOREACH grouped2 GENERATE group,    AVG(groupCluster2.withPremiums::premiums::premium);
+
+STORE premiumsAverage into 'premiumsAverage' using PigStorage('|');
+
+```
   
 ##Utilities and notes. IMPORTANT STUFF
 
@@ -80,3 +107,4 @@ Generate individual Centroid files and one file with all Cluster centroids:
 - If you shutdown or restart the **master** virtual machine, remember to rerun the hadoop format command on it. If not the **namenode** daemon doesn't start:
   - `bin/hadoop namenode -format`
 - If you copy the **jar** file *mahout-examples-0.9-job.jar* to the **hadoop** machines, in the *lib* directory of the **hadoop** installation you don't need to pass it in the **-libjars** parameter of the `hadoop` command. The branch *mahout_tests* of the **vagrant-hadoop-cluster** project copies this file to the *Hadoop* machines.
+- The full **Sqoop** commands are in my **notes** file where I keep my stuff.
