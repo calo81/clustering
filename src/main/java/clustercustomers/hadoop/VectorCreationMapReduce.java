@@ -59,7 +59,7 @@ public class VectorCreationMapReduce extends Configured implements Tool {
         }
 
         private double[] vectorForTrade(String value) {
-            return new double[]{is(value, "Accountant"), is(value, "Plumber")};  //To change body of created methods use File | Settings | File Templates.
+            return new double[]{is(value, "Accountant"), is(value, "Carpenter")};  //To change body of created methods use File | Settings | File Templates.
         }
 
         private double[] vectorForVertical(String value) {

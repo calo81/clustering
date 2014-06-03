@@ -2,3 +2,9 @@
 customerdata/
 target/
 pig_*
+magician.sh
+importedCustomers/
+importedCustomersText/
+importedQuotes/
+clustercustomers/
+

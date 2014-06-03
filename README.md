@@ -26,7 +26,6 @@ This is tested to run only in Mac OSX
     - HADOOP_CONF_DIR must also be unset for the running of the `hadoop fs -put` command.
   - Alternatively execute the program `clustercustomers.camel.Routing` which extracts the data from the MongoDB inserts it into HDFS.
   - This program can be run directly from the IDE or any means to run the main class.
-  - At the moment the files generated in **Hadoop** by this execution are `hdfs://192.168.1.10:9000/chopin_customers` and `hdfs://192.168.1.10:9000/chopin_customers_rfq`
 - Aggregate the data (***IMPORTANT:*** Do this part only if you didn't run the **Scoop** version as that one gets the needed aggregated data with a join)
   - Execute the program `clustercustomers.hadoop.CustomerMapReduce` which takes the different customer files from HDFS, aggregates them and creates a new file in HDFS with all the aggregated data.
   - This execution currently generates the **Hadoop** directory `hdfs://192.168.1.10:9000//user/cscarion/aggregated_customers`
@@ -55,6 +54,7 @@ This is tested to run only in Mac OSX
 Generate individual Centroid files and one file with all Cluster centroids:
   - Run the **hadoop** job: `~/Programs/hadoop-1.2.1/bin/hadoop jar target/cluster_customers-1.0-SNAPSHOT.jar clustercustomers.hadoop.ClusterCentroidsToIndividualFilesMapReduce -libjars $PWD/target/lib/mahout-math-0.9.jar,$PWD/target/lib/mahout-core-0.9.jar,$PWD/target/lib/commons-lang3-3.1.jar`
   - That execution will output one file for each cluster centroid as well as a file with all the centroids with their cluster id.
+- Adding some fake questions for the users to find the most common questions later: `~/Programs/hadoop-1.2.1/bin/hadoop jar target/cluster_customers-1.0-SNAPSHOT.jar clustercustomers.hadoop.fakes.AddingFakeQuestionsToUsersMapReduce -libjars $PWD/target/lib/mahout-math-0.9.jar,$PWD/target/lib/mahout-core-0.9.jar,$PWD/target/lib/commons-lang3-3.1.jar`  
 - Running your aggregations with **Pig**
   - Download and install [Apache Pig](http://pig.apache.org/). I am using in my example **pig-0.12.1**.
   - Set the environment variables HADOOP_HOME and HADOOP_CONF_DIR as before, so **Pig** knows it will connect to the remote Hadoop.
@@ -70,16 +70,18 @@ Generate individual Centroid files and one file with all Cluster centroids:
     - Get the claims: `claims = FOREACH grouped GENERATE group, AVG(neededForAggrregate.customers::claims);`
     - See the results: `DUMP claims;`
     - Now for the seeing the Premium average is similar. But this time we have to export the `quote` table information from `IHub` to `HDFS` as well. then combine it. Like this:
-      - Run the corresponding `Sqoop` Something like the following but with the actual data: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=IHubODS" --query 'SELECT rfq, premium FROM quotes where $CONDITIONS and premium is not null' --split-by  rfq --fetch-size 20 --delete-target-dir --target-dir importedQuotes --package-name "clustercustomers.sqoop.quotes" --null-string '' --fields-terminated-by '|'`  
+      - Run the corresponding `Sqoop` Something like the following but with the actual data: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=IHubODS" --query "SELECT rfq, premium, insurer FROM quotes where \$CONDITIONS and premium is not null and insurer is not null and state='purchased'" --split-by  rfq --fetch-size 20 --delete-target-dir --target-dir importedQuotes --package-name "clustercustomers.sqoop.quotes" --null-string '' --fields-terminated-by '|'`  
       - Copy the files generated to the remote HDFS: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedQuotes hdfs://192.168.1.10:9000/user/cscarion/imported_quotes`
       - Then some more **Pig**
       
 ```
-premiums = LOAD '/user/cscarion/imported_quotes' USING PigStorage('|') AS(rfq_id, premium);
+premiums = LOAD '/user/cscarion/imported_quotes' USING PigStorage('|') AS(rfq_id, premium, insurer);
 cluster = LOAD '/user/cscarion/individual-clusters/part-r-00000' AS(clusterId, customerId);
 customers = LOAD '/user/cscarion/aggregated_customers_text' using PigStorage('|') AS(id, vertical, trade, turnover, claims,rfq_id);
 
 withPremiums = JOIN premiums BY rfq_id, customers BY rfq_id;
+
+rmf /user/cscarion/withPremiums;
 
 store withPremiums into 'withPremiums' using PigStorage('|');
 
@@ -87,11 +89,83 @@ groupCluster2 = JOIN withPremiums BY customers::id, cluster BY customerId;
 
 grouped2 = GROUP groupCluster2 BY cluster::clusterId;
 
-premiumsAverage = FOREACH grouped2 GENERATE group,    AVG(groupCluster2.withPremiums::premiums::premium);
+premiumsAverage = FOREACH grouped2 GENERATE group, AVG(groupCluster2.withPremiums::premiums::premium);
+
+rmf /user/cscarion/premiumsAverage;
 
 STORE premiumsAverage into 'premiumsAverage' using PigStorage('|');
 
 ```
+
+  - Now let's get the most common Insurer used with PIG:
+  
+```
+quotes = LOAD '/user/cscarion/imported_quotes' USING PigStorage('|') AS(rfq_id, premium, insurer);
+cluster = LOAD '/user/cscarion/individual-clusters/part-r-00000' AS(clusterId, customerId);
+customers = LOAD '/user/cscarion/aggregated_customers_text' using PigStorage('|') AS(id, vertical, trade, turnover, claims,rfq_id);
+
+withInsurers = JOIN quotes BY rfq_id, customers BY rfq_id;
+
+groupCluster2 = JOIN withInsurers BY customers::id, cluster BY customerId;
+
+grouped2 = GROUP groupCluster2 BY (cluster::clusterId, withInsurers::quotes::insurer);
+
+countOfInsurer = FOREACH grouped2 GENERATE group, COUNT(groupCluster2.withInsurers::quotes::insurer) AS counted;
+
+flattenedCount = FOREACH countOfInsurer GENERATE FLATTEN(group), counted;
+
+STORE flattenedCount INTO 'flattenedCount' USING PigStorage('|');
+
+flattenedCount = LOAD 'flattenedCount' USING PigStorage('|') AS (cluster, insurer, count:int);
+
+commonInsurer = GROUP flattenedCount BY(cluster);
+
+commonInsurerAggregate = FOREACH commonInsurer {
+   elems = ORDER flattenedCount BY count DESC;
+   one = LIMIT elems 1;
+   GENERATE group, FLATTEN(one.insurer), FLATTEN(one.count);
+ };
+
+rmf /user/cscarion/commonInsurerAggregate
+
+STORE commonInsurerAggregate into 'commonInsurerAggregate' using PigStorage('|');
+
+```
+
+  - Now let's get the most common Questions for each cluster with PIG:
+ 
+```
+cluster = LOAD '/user/cscarion/individual-clusters/part-r-00000' AS(clusterId, customerId);
+customers = LOAD '/user/cscarion/aggregated_customers_text_questions' using PigStorage('|') AS(id, vertical, trade, turnover, claims,rfq_id, question);
+
+groupCluster2 = JOIN customers BY id, cluster BY customerId;
+
+grouped2 = GROUP groupCluster2 BY (cluster::clusterId, customers::question);
+
+countOfQuestions = FOREACH grouped2 GENERATE group, COUNT(groupCluster2.customers::question) AS counted;
+
+flattenedCount = FOREACH countOfQuestions GENERATE FLATTEN(group), counted;
+
+rmf /user/cscarion/flattenedCountOfQuestions
+
+STORE flattenedCount INTO 'flattenedCountOfQuestions' USING PigStorage('|');
+
+flattenedCount = LOAD 'flattenedCountOfQuestions' USING PigStorage('|') AS (cluster, question, count:int);
+
+commonQuestion = GROUP flattenedCount BY(cluster);
+
+commonQuestionAggregate = FOREACH commonQuestion {
+   elems = ORDER flattenedCount BY count DESC;
+   one = LIMIT elems 1;
+   GENERATE group, FLATTEN(one.question), FLATTEN(one.count);
+ };
+
+rmf /user/cscarion/commonQuestionAggregate
+
+STORE commonQuestionAggregate into 'commonQuestionAggregate' using PigStorage('|');
+
+```
+  - All Pig jobs have a script in the **pig** folder on the **clustering** project. They can be run like `$PIG_INSTALLATION_DIR/bin/pig pig/average_premium.pig`. Remember that both **HADOOP_HOME** and **HADOOP_CONF_DIR** must be set before tunning the command for them to be executed against the cluster.
   
 ##Utilities and notes. IMPORTANT STUFF
 
