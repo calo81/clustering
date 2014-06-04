@@ -22,8 +22,8 @@ This is tested to run only in Mac OSX
     - Also copy the generated sequence files to the remote **Hadoop** cluster if you generated it with **Hadoop** locally as myself: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedCustomers hdfs://192.168.1.10:9000/user/cscarion/aggregated_customers`
     - You can also generate a non SequenceFile file like: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://bi02lon:1433;username=xxxx;password=xxxx;databaseName=IHubODS" --query 'xxxx where $CONDITIONS' --split-by  customer._id --fetch-size 20 --delete-target-dir --target-dir importedCustomersText --package-name "clustercustomers.sqoop" --null-string '' --null-string '' --fields-terminated-by '|'`. This one will be used for the aggregations at the end of the whole process, as it is easier to use from **Apache Pig**
     -Then of course copy this file as well to **HDFS**: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedCustomersText hdfs://192.168.1.10:9000/user/cscarion/aggregated_customers_text`
-    - For running both **sqoop** tasks, you must unset `HADOOP_CONF_DIR` as if not it will try to run the jobs in the Hadoop cluster and those virtual machines have no access to the Database. That is in my case.
-    - HADOOP_CONF_DIR must also be unset for the running of the `hadoop fs -put` command.
+    - For running both **sqoop** tasks, you must unset `HADOOP_CONF_DIR` and `HADOOP_CLASSPATH` as if not it will try to run the jobs in the Hadoop cluster and those virtual machines have no access to the Database. That is in my case.
+    - HADOOP_CONF_DIR and HADOOP_CLASSPATH must also be unset for the running of the `hadoop fs -put` command.
   - Alternatively execute the program `clustercustomers.camel.Routing` which extracts the data from the MongoDB inserts it into HDFS.
   - This program can be run directly from the IDE or any means to run the main class.
 - Aggregate the data (***IMPORTANT:*** Do this part only if you didn't run the **Scoop** version as that one gets the needed aggregated data with a join)
@@ -70,7 +70,7 @@ Generate individual Centroid files and one file with all Cluster centroids:
     - Get the claims: `claims = FOREACH grouped GENERATE group, AVG(neededForAggrregate.customers::claims);`
     - See the results: `DUMP claims;`
     - Now for the seeing the Premium average is similar. But this time we have to export the `quote` table information from `IHub` to `HDFS` as well. then combine it. Like this:
-      - Run the corresponding `Sqoop` Something like the following but with the actual data: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=IHubODS" --query "SELECT rfq, premium, insurer FROM quotes where \$CONDITIONS and premium is not null and insurer is not null and state='purchased'" --split-by  rfq --fetch-size 20 --delete-target-dir --target-dir importedQuotes --package-name "clustercustomers.sqoop.quotes" --null-string '' --fields-terminated-by '|'`  
+      - Run the corresponding `Sqoop` Something like the following but with the actual data: `sqoop import --driver com.microsoft.sqlserver.jdbc.SQLServerDriver --connect "jdbc:sqlserver://xxx:1433;username=xxx;password=xxx;databaseName=IHubODS" --query "SELECT rfq, premium, insurer FROM quotes where \$CONDITIONS and premium is not null and insurer is not null" --split-by  rfq --fetch-size 20 --delete-target-dir --target-dir importedQuotes --package-name "clustercustomers.sqoop.quotes" --null-string '' --fields-terminated-by '|'`  
       - Copy the files generated to the remote HDFS: `~/Programs/hadoop-1.2.1/bin/hadoop fs -put importedQuotes hdfs://192.168.1.10:9000/user/cscarion/imported_quotes`
       - Then some more **Pig**
       
@@ -177,7 +177,7 @@ STORE commonQuestionAggregate into 'commonQuestionAggregate' using PigStorage('|
   - Read content of file: `./hadoop dfs -ls /user/cscarion/vector_seq_file/part-r-00000`
 - In the URL **http://master:50030/jobtracker.jsp** you will see the running tasks of your cluster.
 - The final cluster files are generated on `./hadoop dfs -ls /user/cscarion/customer-kmeans`
-- Remember to have `HADOOP_CLASSPATH=/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar:/Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar`
+- Remember to have `HADOOP_CLASSPATH=/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar:/Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar` except for the sqoop.
 - If you shutdown or restart the **master** virtual machine, remember to rerun the hadoop format command on it. If not the **namenode** daemon doesn't start:
   - `bin/hadoop namenode -format`
 - If you copy the **jar** file *mahout-examples-0.9-job.jar* to the **hadoop** machines, in the *lib* directory of the **hadoop** installation you don't need to pass it in the **-libjars** parameter of the `hadoop` command. The branch *mahout_tests* of the **vagrant-hadoop-cluster** project copies this file to the *Hadoop* machines.

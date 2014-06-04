@@ -25,14 +25,13 @@ public class SequenceFileReader {
 
 
         SequenceFile.Reader reader = new SequenceFile.Reader(fs,
-                new Path("/user/cscarion/aggregated_customers/part-m-00001"), conf);
-        LongWritable key = new LongWritable();
-        QueryResult value = new QueryResult();
+                new Path("/user/cscarion/customer-centroids/clusters-0-final/part-r-00000"), conf);
+        Text key = new Text();
+        ClusterWritable value = new ClusterWritable();
 
 
         while (reader.next(key, value)) {
             System.out.println(key.toString() + "  " + value.toString());
-            //System.out.println(value.getValue().getCenter());
         }
         reader.close();
 

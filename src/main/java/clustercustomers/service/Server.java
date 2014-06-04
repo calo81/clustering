@@ -256,7 +256,11 @@ public class Server implements Container {
     }
 
     private double getClaimAverageForCluster(Cluster cluster) throws Exception {
-        return premiumAverages.get(cluster.getId());
+        try{
+            return premiumAverages.get(cluster.getId());
+        }catch(Exception e){
+            return 0.0;
+        }
     }
 
     private Vector toVector(String vector) {

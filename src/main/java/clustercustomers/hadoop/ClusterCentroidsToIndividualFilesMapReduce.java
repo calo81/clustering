@@ -84,7 +84,7 @@ public class ClusterCentroidsToIndividualFilesMapReduce extends Configured imple
         MultipleOutputs.addNamedOutput(job, "seq", SequenceFileOutputFormat.class,
                 IntWritable.class, VectorWritable.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
-        FileInputFormat.addInputPaths(job, "customer-kmeans/clusters-3-final");
+        FileInputFormat.addInputPaths(job, "customer-kmeans/clusters-2-final");
         FileOutputFormat.setOutputPath(job, new Path("individual-centroids"));
         return job.waitForCompletion(true) ? 0 : 1;
     }
