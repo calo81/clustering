@@ -7,13 +7,17 @@ This is tested to run only in Mac OSX
 ##Steps
 
 - Make sure you have your **Hadoop** cluster running. [Follow this instructions](https://github.com/calo81/vagrant-hadoop-cluster)
+  - Important to remember in this part that you must have formatted the HDFS filesystem in the HADOOP master node. Running `bin/hadoop namenode -format` in the Master node HADOOP root directory.
 - Make sure all virtual machines in the virtual cluster can communicate with each other using `ssh`. With the **root** user.
 - Make sure you have **Hadoop 1.2.1** installed in `~/Programs/hadoop-1.2.1/bin/hadoop`
 - Make sure you have **Mahout 0.9** installed in `~/Programs/mahout-distribution-0.9`
 - Build this project (*clustering*) by running `mvn clean install` in the root path of the project.
+- Copy the the **postcodes.csv** file (obtained after unzipping the file **postcodes.zip**) to HDFS:
+  - Make sure the environment variables `HADOOP_HOME` and `HADOOP_CONF` are unset.
+  - Execute `~/Programs/hadoop-1.2.1/bin/hadoop fs -put postcodes.csv hdfs://192.168.1.10:9000/user/cscarion/postcodes`
 - Make sure you configure the environment variables required:
   -`HADOOP_HOME=/Users/cscarion/Programs/hadoop-1.2.1`
-  -`HADOOP_CONF_DIR=/Users/cscarion/projects/vagrant-hadoop-cluster/modules/hadoop/files/`
+  -`HADOOP_CONF_DIR=/Users/cscarion/projects/clustering/hadoop_conf/`
 - Extract the data from the datasources
   - Use [Sqoop](http://sqoop.apache.org/) for extracting the data from your SQL database to HDFS. Make sure you download a **Sqoop** version compatible with the installed **Hadoop** version which is 1.2.1.
     - Copy the JDBC driver for your DB (in my case SQL Server) into the **lib** directory of the **sqoop** installation directory
@@ -176,6 +180,7 @@ STORE commonQuestionAggregate into 'commonQuestionAggregate' using PigStorage('|
   - List contents of directory: `./hadoop dfs -ls /user/cscarion/vector_seq_file`
   - Read content of file: `./hadoop dfs -ls /user/cscarion/vector_seq_file/part-r-00000`
 - In the URL **http://master:50030/jobtracker.jsp** you will see the running tasks of your cluster.
+- In the URL **http://master:50070/dfshealth.jsp** you can see the state of the cluster and access the HDFS filesystem.
 - The final cluster files are generated on `./hadoop dfs -ls /user/cscarion/customer-kmeans`
 - Remember to have `HADOOP_CLASSPATH=/Users/cscarion/Programs/mahout-distribution-0.9/mahout-examples-0.9-job.jar:/Users/cscarion/projects/clustering/target/cluster_customers-1.0-SNAPSHOT.jar` except for the sqoop.
 - If you shutdown or restart the **master** virtual machine, remember to rerun the hadoop format command on it. If not the **namenode** daemon doesn't start:

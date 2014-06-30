@@ -15,7 +15,7 @@ import org.apache.mahout.math.Vector;
  */
 public class CustomWeightedEuclideanDistanceMeasure extends WeightedEuclideanDistanceMeasure {
 
-    public static final Vector WEIGHTS = new DenseVector(new double[]{100.0, 100.0, 50.0, 50.0, 50.0, 1.0/100000000l, 10.0});
+    public static final Vector WEIGHTS = new DenseVector(new double[]{10.0, 10.0, 5.0, 5.0, 5.0, 1.0/100000000l, 1.0,1000,1000});
     public CustomWeightedEuclideanDistanceMeasure(){
         super();
         setWeights(WEIGHTS);

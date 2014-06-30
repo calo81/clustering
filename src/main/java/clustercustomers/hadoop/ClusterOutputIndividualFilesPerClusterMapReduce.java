@@ -65,8 +65,8 @@ public class ClusterOutputIndividualFilesPerClusterMapReduce extends Configured 
     @Override
     public int run(String[] strings) throws Exception {
         Configuration conf = super.getConf();
-        conf.set("fs.default.name", "hdfs://192.168.1.10:9000/");
-        conf.set("mapred.job.tracker", "192.168.1.10:9001");
+        conf.set("fs.default.name", "hdfs://10.10.0.52:9000/");
+        conf.set("mapred.job.tracker", "10.10.0.52:9001");
         Job job = new Job(conf, "cluster-to-individual-files");
         job.setJarByClass(ClusterOutputIndividualFilesPerClusterMapReduce.class);
         job.setMapperClass(ClusterPassThroughMapper.class);

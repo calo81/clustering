@@ -36,23 +36,27 @@ import java.util.StringTokenizer;
  */
 public class VectorCreationMapReduce extends Configured implements Tool {
 
-    public static class VectorizerMapper extends Mapper<LongWritable, QueryResult, Text, VectorWritable> {
+    public static class VectorizerMapper extends Mapper<LongWritable, Text, Text, VectorWritable> {
 
-        public void map(LongWritable key, QueryResult value, Context context) throws IOException, InterruptedException {
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
             VectorWritable writer = new VectorWritable();
-            double[] verticals = vectorForVertical(value.get_product());
-            double[] trade = vectorForTrade(value.get_primary_trade());
-            double[] turnover = vectorForDouble(value.get_annual_turnover());
-            double[] claimCount = vectorForDouble(value.get_claim_count());
-            NamedVector vector = new NamedVector(new DenseVector(concatArrays(verticals, trade, turnover, claimCount)), value.get___id());
+            System.out.println(value.toString());
+            String[] values = value.toString().split("\\|");
+            double[] verticals = vectorForVertical(values[1]);
+            double[] trade = vectorForTrade(values[2]);
+            double[] turnover = vectorForDouble(values[3]);
+            double[] claimCount = vectorForDouble(values[4]);
+            double[] xCoordinate = vectorForDouble(values[7]);
+            double[] yCoordinate = vectorForDouble(values[7]);
+            NamedVector vector = new NamedVector(new DenseVector(concatArrays(verticals, trade, turnover, claimCount, xCoordinate, yCoordinate)), values[0]);
             writer.set(vector);
-            context.write(new Text(value.get___id()), writer);
+            context.write(new Text(values[0]), writer);
         }
 
         private double[] vectorForDouble(String valueString) {
             double value = 0;
-            if (valueString != null) {
+            if (valueString != null && !valueString.isEmpty()) {
                 value = Double.parseDouble(valueString);
             }
             return new double[]{value};
@@ -88,8 +92,8 @@ public class VectorCreationMapReduce extends Configured implements Tool {
     @Override
     public int run(String[] strings) throws Exception {
         Configuration conf = super.getConf();
-        conf.set("fs.default.name", "hdfs://192.168.1.10:9000/");
-        conf.set("mapred.job.tracker", "192.168.1.10:9001");
+        conf.set("fs.default.name", "hdfs://10.10.0.52:9000/");
+        conf.set("mapred.job.tracker", "10.10.0.52:9001");
         Job job = new Job(conf, "customer_to_vector_mapreduce");
         job.setJarByClass(VectorCreationMapReduce.class);
         job.setMapperClass(VectorizerMapper.class);
@@ -97,10 +101,10 @@ public class VectorCreationMapReduce extends Configured implements Tool {
         job.setMapOutputValueClass(VectorWritable.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(VectorWritable.class);
-        job.setInputFormatClass(SequenceFileInputFormat.class);
+        //job.setInputFormatClass(SequenceFileInputFormat.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
         job.setNumReduceTasks(0);
-        FileInputFormat.addInputPaths(job, "aggregated_customers");
+        FileInputFormat.addInputPaths(job, "aggregated_customers_with_coordinates");
         FileOutputFormat.setOutputPath(job, new Path("vector_seq_file"));
         return job.waitForCompletion(true) ? 0 : 1;
     }

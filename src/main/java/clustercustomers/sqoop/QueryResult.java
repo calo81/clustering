@@ -2,7 +2,7 @@
 // WARNING: This class is AUTO-GENERATED. Modify at your own risk.
 //
 // Debug information:
-// Generated date: Thu May 29 17:08:56 BST 2014
+// Generated date: Wed Jun 25 15:59:30 BST 2014
 // For connector: org.apache.sqoop.manager.GenericJdbcManager
 package clustercustomers.sqoop;
 import org.apache.hadoop.io.BytesWritable;
@@ -94,6 +94,17 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         this.claim_count = claim_count;
         return this;
     }
+    private String uk_postcode;
+    public String get_uk_postcode() {
+        return uk_postcode;
+    }
+    public void set_uk_postcode(String uk_postcode) {
+        this.uk_postcode = uk_postcode;
+    }
+    public QueryResult with_uk_postcode(String uk_postcode) {
+        this.uk_postcode = uk_postcode;
+        return this;
+    }
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -108,6 +119,7 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         equal = equal && (this.primary_trade == null ? that.primary_trade == null : this.primary_trade.equals(that.primary_trade));
         equal = equal && (this.annual_turnover == null ? that.annual_turnover == null : this.annual_turnover.equals(that.annual_turnover));
         equal = equal && (this.claim_count == null ? that.claim_count == null : this.claim_count.equals(that.claim_count));
+        equal = equal && (this.uk_postcode == null ? that.uk_postcode == null : this.uk_postcode.equals(that.uk_postcode));
         return equal;
     }
     public void readFields(ResultSet __dbResults) throws SQLException {
@@ -117,6 +129,7 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         this.primary_trade = JdbcWritableBridge.readString(3, __dbResults);
         this.annual_turnover = JdbcWritableBridge.readString(4, __dbResults);
         this.claim_count = JdbcWritableBridge.readString(5, __dbResults);
+        this.uk_postcode = JdbcWritableBridge.readString(6, __dbResults);
     }
     public void loadLargeObjects(LargeObjectLoader __loader)
             throws SQLException, IOException, InterruptedException {
@@ -131,7 +144,8 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         JdbcWritableBridge.writeString(primary_trade, 3 + __off, 12, __dbStmt);
         JdbcWritableBridge.writeString(annual_turnover, 4 + __off, 12, __dbStmt);
         JdbcWritableBridge.writeString(claim_count, 5 + __off, 12, __dbStmt);
-        return 5;
+        JdbcWritableBridge.writeString(uk_postcode, 6 + __off, 12, __dbStmt);
+        return 6;
     }
     public void readFields(DataInput __dataIn) throws IOException {
         if (__dataIn.readBoolean()) {
@@ -158,6 +172,11 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
             this.claim_count = null;
         } else {
             this.claim_count = Text.readString(__dataIn);
+        }
+        if (__dataIn.readBoolean()) {
+            this.uk_postcode = null;
+        } else {
+            this.uk_postcode = Text.readString(__dataIn);
         }
     }
     public void write(DataOutput __dataOut) throws IOException {
@@ -191,6 +210,12 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
             __dataOut.writeBoolean(false);
             Text.writeString(__dataOut, claim_count);
         }
+        if (null == this.uk_postcode) {
+            __dataOut.writeBoolean(true);
+        } else {
+            __dataOut.writeBoolean(false);
+            Text.writeString(__dataOut, uk_postcode);
+        }
     }
     private final DelimiterSet __outputDelimiters = new DelimiterSet((char) 44, (char) 10, (char) 0, (char) 0, false);
     public String toString() {
@@ -205,15 +230,17 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
     public String toString(DelimiterSet delimiters, boolean useRecordDelim) {
         StringBuilder __sb = new StringBuilder();
         char fieldDelim = delimiters.getFieldsTerminatedBy();
-        __sb.append(FieldFormatter.escapeAndEnclose(__id==null?"null":__id, delimiters));
+        __sb.append(FieldFormatter.escapeAndEnclose(__id==null?"":__id, delimiters));
         __sb.append(fieldDelim);
-        __sb.append(FieldFormatter.escapeAndEnclose(product==null?"null":product, delimiters));
+        __sb.append(FieldFormatter.escapeAndEnclose(product==null?"":product, delimiters));
         __sb.append(fieldDelim);
-        __sb.append(FieldFormatter.escapeAndEnclose(primary_trade==null?"null":primary_trade, delimiters));
+        __sb.append(FieldFormatter.escapeAndEnclose(primary_trade==null?"":primary_trade, delimiters));
         __sb.append(fieldDelim);
-        __sb.append(FieldFormatter.escapeAndEnclose(annual_turnover==null?"null":annual_turnover, delimiters));
+        __sb.append(FieldFormatter.escapeAndEnclose(annual_turnover==null?"":annual_turnover, delimiters));
         __sb.append(fieldDelim);
-        __sb.append(FieldFormatter.escapeAndEnclose(claim_count==null?"null":claim_count, delimiters));
+        __sb.append(FieldFormatter.escapeAndEnclose(claim_count==null?"":claim_count, delimiters));
+        __sb.append(fieldDelim);
+        __sb.append(FieldFormatter.escapeAndEnclose(uk_postcode==null?"":uk_postcode, delimiters));
         if (useRecordDelim) {
             __sb.append(delimiters.getLinesTerminatedBy());
         }
@@ -297,6 +324,11 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
             this.claim_count = __cur_str;
         }
 
+        __cur_str = __it.next();
+        if (__cur_str.equals("null")) { this.uk_postcode = null; } else {
+            this.uk_postcode = __cur_str;
+        }
+
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -311,6 +343,7 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         __sqoop$field_map.put("primary_trade", this.primary_trade);
         __sqoop$field_map.put("annual_turnover", this.annual_turnover);
         __sqoop$field_map.put("claim_count", this.claim_count);
+        __sqoop$field_map.put("uk_postcode", this.uk_postcode);
         return __sqoop$field_map;
     }
 
@@ -329,6 +362,9 @@ public class QueryResult extends SqoopRecord  implements DBWritable, Writable {
         }
         else    if ("claim_count".equals(__fieldName)) {
             this.claim_count = (String) __fieldVal;
+        }
+        else    if ("uk_postcode".equals(__fieldName)) {
+            this.uk_postcode = (String) __fieldVal;
         }
         else {
             throw new RuntimeException("No such field: " + __fieldName);
